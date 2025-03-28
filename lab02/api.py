@@ -1,20 +1,20 @@
 from cipher.vigenere import VigenereCipher
 from flask import Flask, request, jsonify
 from cipher.caesar import CaesarCipher
-from cipher.railfence import Railfence
-from cipher.playfail import PlayfairCipher
+from cipher.railfence import RailFenceCipher
+from cipher.playfail import PlayFairCipher
 
 vigenere_cipher = VigenereCipher()
 app = Flask(__name__)
 caesar_cipher = CaesarCipher()
-railfence_cipher = Railfence()
-PlayfairCipher = PlayfairCipher()
+railfence_cipher = RailFenceCipher()
+playfair_cipher = PlayFairCipher()
 
 @app.route("/api/playfair/creatematrix", methods=["POST"])
 def playfair_creatematrix():
     data = request.json
     key=data['key']
-    playfair_matrix = PlayfairCipher.create_playfail_matrix(key)
+    playfair_matrix = playfair_cipher.create_playfair_matrix(key)
     return jsonify({'playfair_matrix': playfair_matrix})
 
 @app.route("/api/playfair/encrypt", methods=["POST"])
@@ -22,8 +22,8 @@ def playfair_encrypt():
     data = request.json
     plain_text = data['plain_text']
     key=data['key']
-    playfail_matrix = PlayfairCipher.create_playfail_matrix(key)
-    encrypted_text = PlayfairCipher.playfair_encrypt(plain_text, playfail_matrix)
+    playfair_matrix = playfair_cipher.create_playfair_matrix(key)
+    encrypted_text =  playfair_cipher.playfair_encrypt(plain_text, playfair_matrix)
     return jsonify({'encrypted_text': encrypted_text})
 
 @app.route("/api/playfair/decrypt", methods=["POST"])
@@ -31,8 +31,8 @@ def playfair_decrypt():
     data = request.json
     cipher_text = data['cipher_text']
     key = data['key']
-    playfail_matrix = PlayfairCipher.create_playfail_matrix(key)
-    decrypted_text = PlayfairCipher.playfair_decrypt(cipher_text, playfail_matrix)
+    playfair_matrix = playfair_cipher.create_playfair_matrix(key)
+    decrypted_text = playfair_cipher.playfair_decrypt(cipher_text, playfair_matrix)
     return jsonify({'decrypted_text': decrypted_text})
 
 @app.route("/api/railfence/encrypt", methods=["POST"])

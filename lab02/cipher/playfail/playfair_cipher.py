@@ -1,9 +1,9 @@
-class PlayFailCipher:
+class PlayFairCipher:
     def __init__(self) -> None:
         pass
-    def __init__(self, key):
+    def __init__(self):
         pass
-    def create_playfail_matrix(self, key):
+    def create_playfair_matrix(self, key):
         key=key.replace('J','I')
         key=key.upper()
         key_set=set(key)
@@ -15,8 +15,8 @@ class PlayFailCipher:
             matrix.append(letter)
             if len(matrix) == 25:
                 break
-        playfail_matrix=[matrix[i:i+5] for i in range(0,len(matrix),5)]
-        return playfail_matrix
+        playfair_matrix=[matrix[i:i+5] for i in range(0,len(matrix),5)]
+        return playfair_matrix
     
     def find_letter_coords(self, matrix, letter):
         for row in range(len(matrix)):
@@ -64,6 +64,8 @@ class PlayFailCipher:
             else:
                 banro += decrypted_text[i]+""+decrypted_text[i+1]
         if decrypted_text[-1]=="X":
+            banro += decrypted_text[-2]
+        else:
             banro += decrypted_text[-2]
             banro += decrypted_text[-1]
         return banro

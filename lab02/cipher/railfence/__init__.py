@@ -1,1 +1,1 @@
-from .railfence_cipher import Railfence
+from .railfence_cipher import RailFenceCipher

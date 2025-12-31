@@ -8,7 +8,7 @@ note:
 
 # DISCORD
 **Join us to discuss and contribute to the project early:**
->   https://discord.gg/7TeGQKnQqb
+> https://discord.gg/yQdmGyUkpm
 
 note:
 > you will get an 'early member' role, after 1,000 - 2,000 people joined you will not be able to obtain it anymore..

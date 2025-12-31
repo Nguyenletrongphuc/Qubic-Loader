@@ -11,7 +11,7 @@ public:
     static constexpr const char* ID = "testmod";
     void init(Qubic::ModState* state) {
         printf("called init!\n");
-        /* register items, max stack in minecraft is 99 (you will get a warning if you go over )*/
+        /* register items, max stack in minecraft is 99 (you will get a warning if you go over) */
         Qubic::RegisterItem(state, "test-item", {128, "Test Item", ""});
         Qubic::RegisterItem(state, "other-item", {128, "Other Item", ""});
     }

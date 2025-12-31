@@ -62,6 +62,11 @@ MOD_EXPORT Qubic::ModState* mod_load(Qubic::ModState* state) {
     return state;
 }
 ```
+![test](./assets/image.png)
+
+note:
+> this code creates two items <br>
+> you can test this right now, but I wouldn’t really recommend it. its not very user-friendly yet; you can create items, but compiling and using it isn’t straightforward.
 
 # KITTY
 ![cat](./assets/cat.png)

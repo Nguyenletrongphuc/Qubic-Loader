@@ -35,7 +35,7 @@ OUTPUT := $(BIN_DIR)/$(PROJECT_NAME)$(DLL_EXT)
 CC := clang
 CXX := clang++
 
-COMMON_FLAGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunused -Wformat=2 -Wno-language-extension-token -Wno-unused-parameter -Wno-unused-private-field
+COMMON_FLAGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunused -Wformat=2 -Wno-language-extension-token -Wno-unused-parameter -Wno-unused-private-field -Wno-sign-conversion -Wno-shorten-64-to-32 -Wno-unused-value
 
 JAVA_HOME := C:\Program Files\Java\jdk-21
 
@@ -59,6 +59,9 @@ else
     CXXFLAGS := -std=c++17 $(COMMON_FLAGS) -O2 -g -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     CFLAGS := -std=c11 $(COMMON_FLAGS) -O2 -g -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
 endif
+
+CXXFLAGS += -DNOMINMAX
+CFLAGS += -DNOMINMAX
 
 ifeq ($(DETECTED_OS),Windows)
     LDFLAGS := -m64 -shared -fuse-ld=lld-link "$(JAVA_HOME)/lib/jvm.lib"

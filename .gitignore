@@ -20,8 +20,8 @@ esp/
 .vscode/
 **/.vscode/
 
-grep.py
-
+grab.py
+grab.txt
 *mak
 *.log
 *.htm

@@ -15,13 +15,63 @@ public class QubicTransformer implements ClassFileTransformer {
             return TransformWindow(ClassFileBuffer);
         }
         
-        /* hook into 'items class static initializer; this is where vanilla items are made */
         if (ClassName.equals("net/minecraft/world/item/Items")) {
             System.out.println("[Qubic] Transforming Items for mod item registration!");
             return TransformItems(ClassFileBuffer);
         }
         
+        /* hook into pack repository to auto-load qubic resource packs */
+        if (ClassName.equals("net/minecraft/server/packs/repository/PackRepository")) {
+            System.out.println("[Qubic] Transforming PackRepository for auto-loading resource packs!");
+            return TransformPackRepository(ClassFileBuffer);
+        }
+        
         return null;
+    }
+    
+    private byte[] TransformPackRepository(byte[] ClassBytes) {
+        ClassReader Reader = new ClassReader(ClassBytes);
+        ClassWriter Writer = new ClassWriter(Reader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        
+        ClassVisitor Visitor = new ClassVisitor(Opcodes.ASM9, Writer) {
+            @Override
+            public MethodVisitor visitMethod(int Access, String Name, String Descriptor, String Signature, String[] Exceptions) {
+                MethodVisitor Mv = super.visitMethod(Access, Name, Descriptor, Signature, Exceptions);
+                
+                /* hook into reload() method */
+                if (Name.equals("reload")) {
+                    System.out.println("[Qubic] Found PackRepository.reload(), injecting pack loader!");
+                    
+                    return new MethodVisitor(Opcodes.ASM9, Mv) {
+                        @Override
+                        public void visitInsn(int Opcode) {
+                            /* right before returning, inject pack loading */
+                            if (Opcode == Opcodes.RETURN) {
+                                System.out.println("[Qubic] Injecting QubicPackLoader.InjectQubicPack call");
+                                
+                                /* load 'this' (PackRepository instance) */
+                                super.visitVarInsn(Opcodes.ALOAD, 0);
+                                
+                                /* call QubicPackLoader.InjectQubicPack(this) */
+                                super.visitMethodInsn(
+                                    Opcodes.INVOKESTATIC,
+                                    "QubicPackLoader",
+                                    "InjectQubicPack",
+                                    "(Lnet/minecraft/server/packs/repository/PackRepository;)V",
+                                    false
+                                );
+                            }
+                            super.visitInsn(Opcode);
+                        }
+                    };
+                }
+                
+                return Mv;
+            }
+        };
+        
+        Reader.accept(Visitor, 0);
+        return Writer.toByteArray();
     }
     
     private byte[] TransformItems(byte[] ClassBytes) {
@@ -73,8 +123,7 @@ public class QubicTransformer implements ClassFileTransformer {
         
         ClassVisitor Visitor = new ClassVisitor(Opcodes.ASM9, Writer) {
             @Override
-            public MethodVisitor visitMethod(int Access, String Name, String Descriptor,
-                                            String Signature, String[] Exceptions) {
+            public MethodVisitor visitMethod(int Access, String Name, String Descriptor, String Signature, String[] Exceptions) {
                 MethodVisitor Mv = super.visitMethod(Access, Name, Descriptor, Signature, Exceptions);
                 
                 return new MethodVisitor(Opcodes.ASM9, Mv) {
@@ -112,8 +161,7 @@ public class QubicTransformer implements ClassFileTransformer {
         
         ClassVisitor Visitor = new ClassVisitor(Opcodes.ASM9, Writer) {
             @Override
-            public MethodVisitor visitMethod(int Access, String Name, String Descriptor,
-                                            String Signature, String[] Exceptions) {
+            public MethodVisitor visitMethod(int Access, String Name, String Descriptor, String Signature, String[] Exceptions) {
                 MethodVisitor Mv = super.visitMethod(Access, Name, Descriptor, Signature, Exceptions);
                 
                 if (Name.equals("render")) {

@@ -23,6 +23,13 @@
 #define CLOSE_LIB(Handle) dlclose(Handle)
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT __attribute__((visibility("default")))
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

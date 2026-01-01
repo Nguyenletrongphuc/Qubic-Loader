@@ -12,7 +12,7 @@ public class QubicAgent {
         try {
             System.loadLibrary("qubic-core");
             QubicNative.Init();
-            System.out.println("[Qubic] Native mods loaded!");
+            System.out.println("[Qubic] QubicNative loading");
         } catch (Exception e) {
             System.err.println("[Qubic] Failed to load native: " + e.getMessage());
             e.printStackTrace();

@@ -11,6 +11,8 @@
 #include <chrono>
 #include <string>
 #include <memory>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,7 +26,7 @@
 
 namespace Qubic {
     class ModLoader;
-    
+
     /* mod state, the base of everything */
     /* mod loader passes basic mod state with jvmti, jvm, and jni instances */
     /* and your mod fills in the missing pieces like the "mod_id" field then returns it */
@@ -34,8 +36,8 @@ namespace Qubic {
         const char* mod_id;
         void* data_ptr;
         
-        JavaVM* GetJVM() const     { return this->jvm_ptr;   }
-        JNIEnv* GetJNI() const     { return this->jni_env;   }
+        JavaVM* GetJVM()     const { return this->jvm_ptr;   }
+        JNIEnv* GetJNI()     const { return this->jni_env;   }
         jvmtiEnv* GetJVMTI() const { return this->jvmti_env; }
     private:
         friend class ModLoader;

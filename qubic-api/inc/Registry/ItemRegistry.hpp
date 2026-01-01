@@ -9,7 +9,8 @@ namespace Qubic {
     public:
         int max_stack = 64;
         std::string name = "";
-        std::string texture;
+        bool fire_resistant = false;
+        int durability = 0;
     };
 
     struct Item final : public RegistryObject {
@@ -23,9 +24,8 @@ namespace Qubic {
         /* SetItemDescriptor (better than having multiple methods imo) */
         void SetItemDescriptor(Qubic::ItemDescriptor new_desc); 
     };
-    using ItemID = Qubic::Item*;
 
-    [[nodiscard]] Qubic::ItemID RegisterItem(Qubic::ModState* state, const std::string& itemid, const Qubic::ItemDescriptor& desc);
+    [[nodiscard]] Qubic::Item* RegisterItem(Qubic::ModState* state, const std::string& itemid, const Qubic::ItemDescriptor& desc);
 }
 
 #endif

@@ -10,10 +10,10 @@ struct TestMod final : public Qubic::BaseMod {
 public:
     static constexpr const char* ID = "testmod";
     void init(Qubic::ModState* state) {
-        printf("called init!\n");
-        /* register items, max stack in minecraft is 99 (you will get a warning if you go over) */
-        Qubic::RegisterItem(state, "test-item", {128, "Test Item", ""});
-        Qubic::RegisterItem(state, "other-item", {128, "Other Item", ""});
+        Qubic::RegisterItem(state, "test_item", {128, "Test Item"});
+        Qubic::RegisterItem(state, "other_item", {128, "Other Item", true});
+
+        Qubic::RegisterItem(state, "ruby_item", {128, "Ruby"});
     }
 
     void on_tick(Qubic::ModState* state) {

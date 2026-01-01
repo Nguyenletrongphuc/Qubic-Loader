@@ -43,7 +43,7 @@ ifeq ($(OS),Windows_NT)
 	)
 else
 	@if [ ! -f "$(CLASSPATH_FILE)" ]; then \
-		echo "[CLASSPATH] Running loader to generate classpath..."; \
+		echo "[CLASSPATH] Running loader to generate classpath" \
 		cd $(BUILD_DIR)/bin && ./qubic --generate-classpath-only; \
 	else \
 		echo "[CLASSPATH] Classpath file already exists"; \

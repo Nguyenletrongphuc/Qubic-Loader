@@ -5,10 +5,6 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
 }
 
 [[nodiscard]] Qubic::Item* Qubic::RegisterItem(Qubic::ModState* state, const std::string& itemid, const Qubic::ItemDescriptor& desc) {
-    int MaxStack = (int)desc.max_stack;
-    if (MaxStack > 99)
-        WARNING("Max stack size is 99");
-
     printf("[Qubic] Registering item: %s:%s\n", state->mod_id, itemid.c_str());
     fflush(stdout);
     
@@ -34,7 +30,7 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
     jmethodID RegisterMethod = env->GetStaticMethodID(
         RegistryClass, 
         "registerItem", 
-        "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)Z"
+        "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ZI)Z"
     );
     
     if (!RegisterMethod) {
@@ -58,7 +54,9 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
         JModID, 
         Jid, 
         desc.max_stack,
-        JDisplayName
+        JDisplayName,
+        desc.fire_resistant,
+        desc.durability
     );
     
     /* basic error check for safety measures */

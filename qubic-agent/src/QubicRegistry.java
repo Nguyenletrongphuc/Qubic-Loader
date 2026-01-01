@@ -16,17 +16,19 @@ public class QubicRegistry {
      * @param displayName Display name for the item (e.g., "Test Item")
      * @return true if successful, false otherwise
      */
-    public static boolean registerItem(String modId, String itemId, int maxStackSize, String displayName) {
+    public static boolean registerItem(String modId, String itemId, int maxStackSize, String displayName, boolean fireResistant, int durability) {
         try {
-            System.out.println("[Qubic] [Java] Registering item: " + modId + ":" + itemId);
+            System.out.println("[Qubic] Registering item: " + modId + ":" + itemId);
             
             Identifier identifier = Identifier.fromNamespaceAndPath(modId, itemId);
             ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, identifier);
             Item.Properties properties = new Item.Properties();
             properties.setId(key);
             
-            if (maxStackSize != 64) { properties.stacksTo(maxStackSize); }
-    
+            if (maxStackSize != 64) { properties.stacksTo(maxStackSize); } /* stacksize flag */
+            if (fireResistant) { properties.fireResistant(); }             /* fire resistant flag */
+            if (durability > 0) { properties.durability(durability); }     /* durability flag */
+
             /* here creates the item */
             Item item = new Item(properties) {
                 @Override
@@ -52,11 +54,11 @@ public class QubicRegistry {
             /* register it using Registry.register */
             Registry.register(BuiltInRegistries.ITEM, identifier, item);
             
-            System.out.println("[Qubic] [Java] Successfully registered: " + modId + ":" + itemId);
+            System.out.println("[Qubic] Successfully registered: " + modId + ":" + itemId);
             return true;
             
         } catch (Exception e) {
-            System.err.println("[Qubic] [Java] ERROR registering item " + modId + ":" + itemId);
+            System.err.println("[Qubic] ERROR registering item " + modId + ":" + itemId);
             e.printStackTrace();
             return false;
         }
@@ -64,6 +66,6 @@ public class QubicRegistry {
     
     /* register an item with default stack size (64) */
     public static boolean registerItem(String modId, String itemId, String displayName) {
-        return registerItem(modId, itemId, 64, displayName);
+        return registerItem(modId, itemId, 64, displayName, false, 0);
     }
 }

@@ -26,14 +26,13 @@ public class QubicPackLoader {
             /* create a pack info */
             PackLocationInfo locationInfo = new PackLocationInfo(
                 "qubic_mods",                           /* id */
-                Component.literal("Qubic Loader Mods"), /* title */
+                Component.literal("Qubic Loader"), /* title */
                 PackSource.BUILT_IN,                    /* source */
                 java.util.Optional.empty()              /* knownPackInfo */
             );
             
             /* create ResourcesSupplier using PathResourcesSupplier */
-            PathPackResources.PathResourcesSupplier resourcesSupplier = 
-                new PathPackResources.PathResourcesSupplier(packPath);
+            PathPackResources.PathResourcesSupplier resourcesSupplier = new PathPackResources.PathResourcesSupplier(packPath);
             
             /* ceate PackSelectionConfig - required = true, fixedPosition = true, defaultPosition = TOP */
             PackSelectionConfig selectionConfig = new PackSelectionConfig(

@@ -29,8 +29,8 @@ namespace Qubic {
 
     /* mod state, the base of everything */
     /* mod loader passes basic mod state with jvmti, jvm, and jni instances */
-    /* and your mod fills in the missing pieces like the "mod_id" field then returns it */
-    /* very basic architechure, and i think it works quite well*/
+    /* your mod fills in the missing pieces like the "mod_id" field then returns it */
+    /* very basic architechure, and I think it works quite well*/
     struct ModState final {
     public:
         const char* mod_id;
@@ -46,9 +46,9 @@ namespace Qubic {
         jvmtiEnv* jvmti_env;
     };
 
-    /* base mod, pretty cool.. you should inherit from it cause it gives your mods structures */
+    /* base mod, pretty cool.. you should inherit from it cause it gives your mod structure */
     /* .. anyone who thought they could use qubic to escape 'java class hell' will be disappointed .. */
-    /* (jk) you can write your mod code however you want, as long as the mod state has methods for the mod loader to execute it.. */
+    /* (jk) you can write your mod code however you want, as long as the mod state has methods for the mod loader to execute */
     struct BaseMod {
     public:
         virtual void init(Qubic::ModState* state) = 0;

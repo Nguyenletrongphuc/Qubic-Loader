@@ -1,4 +1,4 @@
-MOD_NAME := test_mod
+MOD_NAME := ModHelper
 MAKEFLAGS += -j --no-print-directory
 ifeq ($(OS),Windows_NT)
     SHELL := cmd.exe
@@ -29,31 +29,31 @@ endif
 
 SRC_DIR := ./src
 ASSETS_DIR := ./pack
-BUILD_DIR := ./build
-OBJ_DIR := $(BUILD_DIR)/obj
-OUTPUT := $(BUILD_DIR)/$(MOD_NAME)$(DLL_EXT)
-ASSETS_OUTPUT := $(BUILD_DIR)/$(MOD_NAME).pck
+BUILD_DIR := ../build
+OBJ_DIR := $(BUILD_DIR)/obj-dll
+OUTPUT := $(BUILD_DIR)/bin/mods/$(MOD_NAME)$(DLL_EXT)
+ASSETS_OUTPUT := $(BUILD_DIR)/bin/mods/$(MOD_NAME).pck
 CC := clang
 CXX := clang++
 COMMON_FLAGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunused -Wformat=2 -Wno-language-extension-token -Wno-unused-parameter
 JAVA_HOME := C:\Program Files\Java\jdk-21
-QUBIC_API_DIR := ../../qubic-api
+QUBIC_API_DIR := ../qubic-api
 QUBIC_LIB := $(QUBIC_API_DIR)/build/lib/qubic-api.lib
 
 ifeq ($(DETECTED_OS),Windows)
-    INC_DIRS := src include ./ ../../ $(QUBIC_API_DIR)
+    INC_DIRS := src include ./ ../ $(QUBIC_API_DIR)
     JAVA_INC := -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
     CXXFLAGS := -std=c++17 $(COMMON_FLAGS) -O2 -m64 $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     CFLAGS := -std=c11 $(COMMON_FLAGS) -O2 -m64 $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     LDFLAGS := -m64 -shared -fuse-ld=lld-link -Wl,/NOIMPLIB "$(QUBIC_LIB)"
 else ifeq ($(DETECTED_OS),Linux)
-    INC_DIRS := src include ./ ../../ $(QUBIC_API_DIR)
+    INC_DIRS := src include ./ ../ $(QUBIC_API_DIR)
     JAVA_INC := -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
     CXXFLAGS := -std=c++17 $(COMMON_FLAGS) -O2 -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     CFLAGS := -std=c11 $(COMMON_FLAGS) -O2 -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     LDFLAGS := -shared $(QUBIC_LIB)
 else ifeq ($(DETECTED_OS),macOS)
-    INC_DIRS := src include ./ ../../ $(QUBIC_API_DIR)
+    INC_DIRS := src include ./ ../ $(QUBIC_API_DIR)
     JAVA_INC := -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
     CXXFLAGS := -std=c++17 $(COMMON_FLAGS) -O2 -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)
     CFLAGS := -std=c11 $(COMMON_FLAGS) -O2 -fPIC $(addprefix -I,$(INC_DIRS)) $(JAVA_INC)

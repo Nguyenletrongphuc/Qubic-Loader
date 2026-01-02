@@ -10,10 +10,10 @@ struct TestMod final : public Qubic::BaseMod {
 public:
     static constexpr const char* ID = "testmod";
     void init(Qubic::ModState* state) {
-        Qubic::RegisterItem(state, "test_item", {128, "Test Item"});
-        Qubic::RegisterItem(state, "other_item", {128, "Other Item", true});
+        Qubic::RegisterItem(state, "test_item",     { 64, "Test Item" });
+        Qubic::RegisterItem(state, "other_item",    { 64, "Other Item", true });
 
-        Qubic::RegisterItem(state, "ruby_item", {128, "Ruby"});
+        Qubic::RegisterItem(state, "ruby_item",     { 64, "Ruby"});
     }
 
     void on_tick(Qubic::ModState* state) {
@@ -27,7 +27,7 @@ MOD_EXPORT Qubic::ModState* mod_load(Qubic::ModState* state) {
 
     state->mod_id = TestMod::ID;
     state->data_ptr = Mod;
-    
+
     printf("'%s' loaded!\n", TestMod::ID);
 
     Mod->init(state);

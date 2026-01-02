@@ -1,6 +1,6 @@
 # QUBIC
 
-<img src="./assets/icon/beta_logo2.png" alt="build" width="50%">
+<img src="./assets/icon/ql.jpg" alt="build" width="50%">
 
 # nothing much.. for now..
 note:

@@ -172,9 +172,7 @@ extern "C" {
         if (!Data) return nullptr;
         
         jbyteArray Result = env->NewByteArray(Data->size());
-        env->SetByteArrayRegion(Result, 0, Data->size(), 
-                            reinterpret_cast<const jbyte*>(Data->data()));
-        
+        env->SetByteArrayRegion(Result, 0, Data->size(), reinterpret_cast<const jbyte*>(Data->data()));
         return Result;
     }
 

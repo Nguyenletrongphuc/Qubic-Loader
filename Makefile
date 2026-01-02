@@ -26,7 +26,7 @@ CLASSPATH_FILE := $(BUILD_DIR)/bin/logs/classpath.txt
 
 .PHONY: all clean qubic-loader qubic-agent qubic-api qubic-core test-mod generate-classpath
 
-all: qubic-loader generate-classpath qubic-agent qubic-api qubic-core test-mod
+all: qubic-loader generate-classpath qubic-agent qubic-api qubic-core qubic-mod test-mod
 
 qubic-loader:
 	@echo [MAKE] qubic-loader
@@ -63,6 +63,10 @@ qubic-core: qubic-api
 	@echo [MAKE] qubic-core
 	@$(MAKE) -C qubic-core || echo [SKIP] qubic-core
 
+qubic-mod: qubic-api
+	@echo [MAKE] qubic-mod
+	@$(MAKE) -C qubic-mod || echo [SKIP] test-mod
+
 test-mod: qubic-api
 	@echo [MAKE] test-mod
 	@$(MAKE) -C tests/test-mod || echo [SKIP] test-mod
@@ -83,4 +87,4 @@ loader: qubic-loader
 agent: qubic-loader generate-classpath qubic-agent
 api: qubic-api
 core: qubic-api qubic-core
-mod: qubic-api test-mod
+mod: qubic-api qubic-mod test-mod

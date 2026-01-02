@@ -4,6 +4,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import com.mojang.serialization.Lifecycle;
@@ -16,7 +20,7 @@ public class QubicRegistry {
      * @param displayName Display name for the item (e.g., "Test Item")
      * @return true if successful, false otherwise
      */
-    public static boolean registerItem(String modId, String itemId, int maxStackSize, String displayName, boolean fireResistant, int durability) {
+    public static boolean registerItem(String modId, String itemId, int maxStackSize, String displayName, boolean fireResistant, int durability, boolean hasCallbacks) {
         try {
             System.out.println("[Qubic] Registering item: " + modId + ":" + itemId);
             
@@ -29,27 +33,59 @@ public class QubicRegistry {
             if (fireResistant) { properties.fireResistant(); }             /* fire resistant flag */
             if (durability > 0) { properties.durability(durability); }     /* durability flag */
 
-            /* here creates the item */
-            Item item = new Item(properties) {
-                @Override
-                public Component getName(net.minecraft.world.item.ItemStack stack) {
-                    return Component.literal(displayName);
-                }
-                
-                @Override
-                public void appendHoverText(net.minecraft.world.item.ItemStack stack,
-                                           net.minecraft.world.item.Item.TooltipContext context,
-                                           net.minecraft.world.item.component.TooltipDisplay tooltipDisplay,
-                                           java.util.function.Consumer<Component> consumer,
-                                           net.minecraft.world.item.TooltipFlag tooltipFlag) 
-                {
-                    super.appendHoverText(stack, context, tooltipDisplay, consumer, tooltipFlag);
+            // Store these in final variables so they can be used in anonymous class
+            final String finalDisplayName = displayName;
+            final String fullItemId = modId + ":" + itemId;
+
+            /* here creates the item, (NOTE: different method based on if it has callbacks or not) */
+            
+            Item item;
+            if (hasCallbacks) {
+                item = new Item(properties) {
+                    @Override
+                    public Component getName(net.minecraft.world.item.ItemStack stack) {
+                        return Component.literal(finalDisplayName);
+                    }
                     
-                    /* uhh basically adds a blue italic tag as a description of the item */
-                    String modName = modId.substring(0, 1).toUpperCase() + modId.substring(1);
-                    consumer.accept(Component.literal(modName).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
-                }
-            };
+                    @Override
+                    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+                        /* if item was used then call its callback method */
+                        return QubicItemHandler.handleUse(world, player, hand, fullItemId);
+                    }
+                    
+                    @Override
+                    public void appendHoverText(net.minecraft.world.item.ItemStack stack,
+                                               net.minecraft.world.item.Item.TooltipContext context,
+                                               net.minecraft.world.item.component.TooltipDisplay tooltipDisplay,
+                                               java.util.function.Consumer<Component> consumer,
+                                               net.minecraft.world.item.TooltipFlag tooltipFlag) 
+                    {
+                        super.appendHoverText(stack, context, tooltipDisplay, consumer, tooltipFlag);
+                        String modName = modId.substring(0, 1).toUpperCase() + modId.substring(1);
+                        consumer.accept(Component.literal(modName).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
+                    }
+                };
+            } else {
+                // Regular item without callbacks
+                item = new Item(properties) {
+                    @Override
+                    public Component getName(net.minecraft.world.item.ItemStack stack) {
+                        return Component.literal(finalDisplayName);
+                    }
+                    
+                    @Override
+                    public void appendHoverText(net.minecraft.world.item.ItemStack stack,
+                                               net.minecraft.world.item.Item.TooltipContext context,
+                                               net.minecraft.world.item.component.TooltipDisplay tooltipDisplay,
+                                               java.util.function.Consumer<Component> consumer,
+                                               net.minecraft.world.item.TooltipFlag tooltipFlag) 
+                    {
+                        super.appendHoverText(stack, context, tooltipDisplay, consumer, tooltipFlag);
+                        String modName = modId.substring(0, 1).toUpperCase() + modId.substring(1);
+                        consumer.accept(Component.literal(modName).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
+                    }
+                };
+            }
             
             /* register it using Registry.register */
             Registry.register(BuiltInRegistries.ITEM, identifier, item);
@@ -66,6 +102,6 @@ public class QubicRegistry {
     
     /* register an item with default stack size (64) */
     public static boolean registerItem(String modId, String itemId, String displayName) {
-        return registerItem(modId, itemId, 64, displayName, false, 0);
+        return registerItem(modId, itemId, 64, displayName, false, 0, false);
     }
 }

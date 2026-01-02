@@ -1,16 +1,21 @@
 #ifndef ITEMREGISTRY_HPP
 #define ITEMREGISTRY_HPP
 
-#include <inc/Qubic.hpp>
-#include <inc/Registry/RegistryObject.hpp>
+#include <qubic-api/inc/Qubic.hpp>
+#include <qubic-api/inc/Registry/RegistryObject.hpp>
 
 namespace Qubic {
+    struct ItemActionContext;
+    typedef void (*ItemUseCallback)(ItemActionContext* ctx);
+
     struct ItemDescriptor final {
     public:
         int max_stack = 64;
         std::string name = "";
         bool fire_resistant = false;
         int durability = 0;
+
+        ItemUseCallback on_use = nullptr;
     };
 
     struct Item final : public RegistryObject {
@@ -21,7 +26,6 @@ namespace Qubic {
         std::string GetID() { return this->id; }
         std::string SetID(std::string new_id) { return this->id = new_id; }
         
-        /* SetItemDescriptor (better than having multiple methods imo) */
         void SetItemDescriptor(Qubic::ItemDescriptor new_desc); 
     };
 

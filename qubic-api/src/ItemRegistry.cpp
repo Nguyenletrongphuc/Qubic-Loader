@@ -14,8 +14,18 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
         fflush(stdout);
         return nullptr;
     }
+
+    /* check if it has callbacks and register with qubic-core */
+    bool HasCallbacks = (desc.on_use != nullptr);
+    if (HasCallbacks) {
+        std::string full_id = std::string(state->mod_id) + ":" + itemid;
+        Qubic::PendingItemCallback pending;
+        pending.full_item_id = full_id;
+        pending.descriptor = new Qubic::ItemDescriptor(desc); // Allocate on heap
+        state->pending_callbacks.push_back(pending);
+        printf("[Qubic] Stored callback for: %s\n", full_id.c_str());
+    }
     
-    /* nice, our java agent already made 'hooks' for us, so in c++ we use JNI to do stuff (W) */
     jclass RegistryClass = env->FindClass("QubicRegistry");
     if (!RegistryClass) {
         printf("[Qubic] ERROR: Could not find QubicRegistry class\n");
@@ -30,7 +40,7 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
     jmethodID RegisterMethod = env->GetStaticMethodID(
         RegistryClass, 
         "registerItem", 
-        "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ZI)Z"
+        "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ZIZ)Z"
     );
     
     if (!RegisterMethod) {
@@ -56,7 +66,8 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
         desc.max_stack,
         JDisplayName,
         desc.fire_resistant,
-        desc.durability
+        desc.durability,
+        HasCallbacks
     );
     
     /* basic error check for safety measures */

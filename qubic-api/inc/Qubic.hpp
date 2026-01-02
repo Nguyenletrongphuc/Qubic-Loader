@@ -12,6 +12,10 @@
 #include <string>
 #include <memory>
 #include <filesystem>
+#include <unordered_map>
+#include <map>
+#include <set>
+
 namespace fs = std::filesystem;
 
 #ifdef _WIN32
@@ -26,6 +30,13 @@ namespace fs = std::filesystem;
 
 namespace Qubic {
     class ModLoader;
+    struct ItemDescriptor;
+
+    struct PendingItemCallback final {
+    public:
+        std::string full_item_id;  // "modid:itemid"
+        ItemDescriptor* descriptor;
+    };
 
     /* mod state, the base of everything */
     /* mod loader passes basic mod state with jvmti, jvm, and jni instances */
@@ -35,6 +46,9 @@ namespace Qubic {
     public:
         const char* mod_id;
         void* data_ptr;
+
+        /* vector to store pending item callbacks */
+        std::vector<PendingItemCallback> pending_callbacks;
         
         JavaVM* GetJVM()     const { return this->jvm_ptr;   }
         JNIEnv* GetJNI()     const { return this->jni_env;   }

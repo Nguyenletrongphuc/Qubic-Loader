@@ -1,5 +1,7 @@
 
 #include <qubic-api/inc/Qubic.hpp>
+#include <qubic-api/inc/Registry/ItemRegistry.hpp>
+
 #include <src/core/Binary.h>
 #include <src/Loader.hpp>
 
@@ -143,6 +145,14 @@ bool Qubic::ModLoader::LoadMod(const fs::path& Directory) {
             CloseBin(Handle);
             return false;
         }
+    }
+
+    /* process all pending callbacks from this mod */
+    printf("[Qubic] Processing %zu callbacks for mod: %s\n", Result->pending_callbacks.size(), Result->mod_id);
+    for (const auto& callback : Result->pending_callbacks) {
+        g_ItemCallbacks[callback.full_item_id] = *(callback.descriptor); // Dereference pointer
+        printf("[Qubic] Registered callback: %s\n", callback.full_item_id.c_str());
+        delete callback.descriptor; // Clean up heap allocation
     }
 
     fs::path PackPath = Directory.parent_path() / (Directory.stem().string() + ".pck");

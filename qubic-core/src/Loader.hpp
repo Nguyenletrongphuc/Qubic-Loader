@@ -18,6 +18,7 @@ namespace fs = std::filesystem;
 #define SLEEP_MS(ms) std::this_thread::sleep_for(std::chrono::milliseconds(ms))
 
 typedef Qubic::ModState* (*ModLoadFunc)(Qubic::ModState*);
+extern std::unordered_map<std::string, Qubic::ItemDescriptor> g_ItemCallbacks;
 
 namespace {
     struct LoadedMod final {

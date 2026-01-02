@@ -26,7 +26,7 @@ public class QubicPackLoader {
             /* create a pack info */
             PackLocationInfo locationInfo = new PackLocationInfo(
                 "qubic_mods",                           /* id */
-                Component.literal("Qubic Loader"), /* title */
+                Component.literal("Qubic Loader"),      /* title */
                 PackSource.BUILT_IN,                    /* source */
                 java.util.Optional.empty()              /* knownPackInfo */
             );

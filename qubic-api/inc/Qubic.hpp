@@ -19,8 +19,21 @@
 namespace fs = std::filesystem;
 
 #ifdef _WIN32
-#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
 #endif
+#include <windows.h>
+#ifdef SendMessage
+#undef SendMessage
+#endif
+#ifdef GetMessage
+#undef GetMessage
+#endif
+#ifdef PostMessage
+#undef PostMessage
+#endif
+#endif // _WIN32
 
 #ifdef _WIN32
 #define MOD_EXPORT __declspec(dllexport)
@@ -31,6 +44,15 @@ namespace fs = std::filesystem;
 namespace Qubic {
     class ModLoader;
     struct ItemDescriptor;
+    
+    struct PlayerJoinEvent;
+    struct PlayerTickEvent;
+    struct KeyInputEvent;
+
+    struct Vec3 final {
+    public:
+        float x, y, z;
+    };
 
     struct PendingItemCallback final {
     public:
@@ -60,13 +82,14 @@ namespace Qubic {
         jvmtiEnv* jvmti_env;
     };
 
-    /* base mod, pretty cool.. you should inherit from it cause it gives your mod structure */
-    /* .. anyone who thought they could use qubic to escape 'java class hell' will be disappointed .. */
-    /* (jk) you can write your mod code however you want, as long as the mod state has methods for the mod loader to execute */
     struct BaseMod {
     public:
         virtual void init(Qubic::ModState* state) = 0;
-        virtual void on_tick(Qubic::ModState* state) {}
+        virtual void on_tick(Qubic::ModState* state) { }
+
+        virtual void OnPlayerTick(PlayerTickEvent* e) { }
+        virtual void OnPlayerJoin(PlayerJoinEvent* e) { }
+        virtual void OnKeyInput(KeyInputEvent* e) { }
         
         virtual ~BaseMod() = default;
     };

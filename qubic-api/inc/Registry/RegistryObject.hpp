@@ -7,8 +7,7 @@ struct RegistryObject {
 public:
     std::string id;
     virtual ~RegistryObject() = default;
-
-    const std::string& get_id() const { return id; }
+    const std::string& get_id() const { return this->id; }
 };
 
 #endif

@@ -8,6 +8,10 @@
 #include <chrono>
 #include <filesystem>
 
+#include <qubic-api/inc/Event/PlayerJoinEvent.hpp>
+#include <qubic-api/inc/Event/PlayerTickEvent.hpp>
+#include <qubic-api/inc/Event/KeyInputEvent.hpp>
+
 namespace fs = std::filesystem;
 
 jvmtiEnv* jvmti = nullptr;
@@ -37,10 +41,8 @@ extern "C" {
 
     /* this gets called during BuiltInRegistries.<clinit> (best timing to load the mods in YASSSSS) */
     DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_RegisterModItems(JNIEnv* env, jclass clazz) {
-        printf("[Qubic] ========================================\n");
         printf("[Qubic] RegisterModItems called\n");
         printf("[Qubic] Registry initialization in progress\n");
-        printf("[Qubic] ========================================\n");
         
         if (jvm == nullptr || genv == nullptr || jvmti == nullptr) {
             printf("[Qubic] ERROR: JVM not initialized!\n");
@@ -82,5 +84,64 @@ extern "C" {
         
         printf("[Qubic] Loaded %d mod(s)\n", ModCount);
         printf("[Qubic] All items registered!\n");
+    }
+
+    /* dispatching the player join event to mods */
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnPlayerJoin(JNIEnv* env, jclass clazz, jobject player, jobject world) {
+        if (!gModLoader) {
+            printf("[Qubic] ERROR: ModLoader not initialized!\n");
+            return;
+        }
+        
+        printf("[Qubic] Player joined event triggered\n");
+        Qubic::PlayerJoinEvent event;
+        event.player = player;
+        event.world = world;
+        event.env = env;
+        
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->OnPlayerJoin(&event);
+        }
+    }
+
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnKeyInput(JNIEnv* env, jclass clazz, jint key, jint scancode, jint action, jint mods) {
+        if (!gModLoader) return;
+        
+        Qubic::KeyInputEvent event;
+        event.key = key;
+        event.scancode = scancode;
+        event.action = action;
+        event.mods = mods;
+        event.env = env;
+
+        /* dispatch key input to all mods */
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->OnKeyInput(&event);
+        }
+    }
+    
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnPlayerTick(JNIEnv* env, jclass clazz, jobject player, jobject world) {
+        if (!gModLoader) return;
+        
+        Qubic::PlayerTickEvent event;
+        event.player = player;
+        event.world = world;
+        event.env = env;
+        
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->OnPlayerTick(&event);
+        }
+    }
+    
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnServerTick(JNIEnv* env, jclass clazz) {
+        if (!gModLoader) return;
+        
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->on_tick(&mod.State);
+        }
     }
 }

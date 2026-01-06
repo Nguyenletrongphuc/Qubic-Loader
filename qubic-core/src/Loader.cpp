@@ -165,8 +165,10 @@ bool Qubic::ModLoader::LoadMod(const fs::path& Directory) {
         gAssetManager->AddModAssets(Result->mod_id, PackPath);
     else
         printf("[Qubic] WARNING: No pack file found for mod: %s\n", Result->mod_id);
+
+    Qubic::BaseMod* ModInstance = static_cast<Qubic::BaseMod*>(Result->data_ptr);
     
-    this->ModVector.push_back({Result->mod_id, *Result, Handle});
+    this->ModVector.push_back({Result->mod_id, *Result, Handle, ModInstance});
     printf("[Qubic] DEBUG: Loaded ModId: %s\n", Result->mod_id);
     return true;
 }

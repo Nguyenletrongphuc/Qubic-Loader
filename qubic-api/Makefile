@@ -4,7 +4,7 @@ AR = ar
 
 SRC_DIR = src
 INC_DIR = inc
-BUILD_DIR = build
+BUILD_DIR = ../build
 OBJ_DIR = $(BUILD_DIR)/obj-lib
 LIB_DIR = $(BUILD_DIR)/lib
 MINIZ_DIR = include/miniz

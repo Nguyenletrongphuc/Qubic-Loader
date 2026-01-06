@@ -26,6 +26,7 @@ namespace {
         const char* ModID;
         Qubic::ModState State;
         void* Handle;
+        Qubic::BaseMod* ModInstance;
     };
 }
 
@@ -35,11 +36,12 @@ namespace Qubic {
         JavaVM* jvm_ptr;
         JNIEnv* jni_env;
         jvmtiEnv* jvmti_env;
-    
-        std::vector<LoadedMod> ModVector;
     public:
+        std::vector<LoadedMod> ModVector;
+        
         ModLoader(JavaVM* jvm, JNIEnv* env, jvmtiEnv* jvmti) : jvm_ptr(jvm), jni_env(env), jvmti_env(jvmti) {}
         bool LoadMod(const fs::path& Directory);
+
         ~ModLoader() = default;
     };
 }

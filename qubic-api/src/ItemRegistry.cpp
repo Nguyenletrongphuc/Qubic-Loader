@@ -5,12 +5,17 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
 }
 
 [[nodiscard]] Qubic::Item* Qubic::RegisterItem(Qubic::ModState* state, const std::string& itemid, const Qubic::ItemDescriptor& desc) {
+    if (desc.max_stack > 99 || desc.max_stack < 1) {
+        fprintf(stderr, "[Qubic] WARNING: Item %s:%s has max_stack=%d (recommended: 1-99)\n", state->mod_id, itemid.c_str(), desc.max_stack);
+        fflush(stderr);
+    }
+
     printf("[Qubic] Registering item: %s:%s\n", state->mod_id, itemid.c_str());
     fflush(stdout);
     
     JNIEnv* env = state->GetJNI();
     if (!env) {
-        printf("[Qubic] ERROR: JNIEnv is null!\n");
+        printf("[Qubic] ERROR: JNIEnv is null\n");
         fflush(stdout);
         return nullptr;
     }
@@ -21,7 +26,7 @@ void Qubic::Item::SetItemDescriptor(Qubic::ItemDescriptor new_desc) {
         std::string full_id = std::string(state->mod_id) + ":" + itemid;
         Qubic::PendingItemCallback pending;
         pending.full_item_id = full_id;
-        pending.descriptor = new Qubic::ItemDescriptor(desc); // Allocate on heap
+        pending.descriptor = new Qubic::ItemDescriptor(desc);
         state->pending_callbacks.push_back(pending);
         printf("[Qubic] Stored callback for: %s\n", full_id.c_str());
     }

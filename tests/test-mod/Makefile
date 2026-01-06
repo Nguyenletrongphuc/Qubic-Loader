@@ -38,7 +38,7 @@ CXX := clang++
 COMMON_FLAGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wunused -Wformat=2 -Wno-language-extension-token -Wno-unused-parameter
 JAVA_HOME := C:\Program Files\Java\jdk-21
 QUBIC_API_DIR := ../../qubic-api
-QUBIC_LIB := $(QUBIC_API_DIR)/build/lib/qubic-api.lib
+QUBIC_LIB := ../../build/lib/qubic-api.lib
 
 ifeq ($(DETECTED_OS),Windows)
     INC_DIRS := src include ./ ../../ $(QUBIC_API_DIR)

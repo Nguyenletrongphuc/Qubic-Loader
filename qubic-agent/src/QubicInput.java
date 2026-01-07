@@ -4,8 +4,6 @@ import com.mojang.blaze3d.platform.Window;
 
 public class QubicInput {
     private static GLFWKeyCallback previousCallback = null;
-    
-    // Changed parameter type from Object to Window
     public static void setupKeyCallback(Window window) {
         try {
             /* get GLFW window handle */

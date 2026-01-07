@@ -3,7 +3,7 @@
 
 struct ModHelper final : public Qubic::BaseMod {
 public:
-    static constexpr const char* ID = "qubicmodhelper";
+    static constexpr const char* ID = "qubicdefaultmodhelpermod";
     void init(Qubic::ModState* state) { printf("[Qubic] Mod helper initialized!\n"); }
 }; 
 

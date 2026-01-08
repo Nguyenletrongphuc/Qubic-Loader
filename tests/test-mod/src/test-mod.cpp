@@ -120,8 +120,6 @@ public:
     }
 }; 
 
-// TODO: Make a "LocalPlayer" class or thing that allows you to set the clients fov and client based attributes like that
-
 MOD_EXPORT Qubic::ModState* mod_load(Qubic::ModState* state) {
     printf("mod loaded!\n");
     TestMod* Mod = new TestMod();

@@ -5,6 +5,8 @@
 #include <jvmti.h>
 
 #include <cstdint>
+#include <sstream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <thread>
@@ -47,7 +49,10 @@ namespace Qubic {
     
     struct PlayerJoinEvent;
     struct PlayerTickEvent;
+
     struct KeyInputEvent;
+    struct MouseInputEvent;
+    struct MouseScrollInputEvent;
 
     struct Vec3 final {
     public:
@@ -89,8 +94,11 @@ namespace Qubic {
 
         virtual void OnPlayerTick(PlayerTickEvent* e) { }
         virtual void OnPlayerJoin(PlayerJoinEvent* e) { }
-        virtual void OnKeyInput(KeyInputEvent* e) { }
         
+        virtual void OnKeyInput(KeyInputEvent* e) { }
+        virtual void OnMouseButton(MouseInputEvent* e) { }
+        virtual void OnMouseScroll(MouseScrollInputEvent* e) { }
+
         virtual ~BaseMod() = default;
     };
 }

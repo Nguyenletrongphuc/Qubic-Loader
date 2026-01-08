@@ -23,6 +23,12 @@ public class QubicTransformer implements ClassFileTransformer {
             System.out.println("[Qubic] Transforming KeyboardHandler for key input!");
             return TransformKeyboardHandler(ClassFileBuffer);
         }
+
+        /* hook into MouseHandler to intercept mouse events */
+        if (ClassName.equals("net/minecraft/client/MouseHandler")) {
+            System.out.println("[Qubic] Transforming MouseHandler for mouse input!");
+            return TransformMouseHandler(ClassFileBuffer);
+        }
         
         /* hook into item class */
         if (ClassName.equals("net/minecraft/world/item/Items")) {
@@ -55,6 +61,98 @@ public class QubicTransformer implements ClassFileTransformer {
         }
         
         return null;
+    }
+
+    private byte[] TransformMouseHandler(byte[] ClassBytes) {
+        ClassReader Reader = new ClassReader(ClassBytes);
+        ClassWriter Writer = new ClassWriter(Reader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        
+        ClassVisitor Visitor = new ClassVisitor(Opcodes.ASM9, Writer) {
+            @Override
+            public MethodVisitor visitMethod(int Access, String Name, String Descriptor, String Signature, String[] Exceptions) {
+                MethodVisitor Mv = super.visitMethod(Access, Name, Descriptor, Signature, Exceptions);
+                
+                /* hook into onButton(), signature: (JLnet/minecraft/client/input/MouseButtonInfo;I)V */
+                if (Name.equals("onButton") && Descriptor.equals("(JLnet/minecraft/client/input/MouseButtonInfo;I)V")) {
+                    System.out.println("[Qubic] Found MouseHandler.onButton, injecting mouse event!");
+                    
+                    return new MethodVisitor(Opcodes.ASM9, Mv) {
+                        @Override
+                        public void visitCode() {
+                            super.visitCode();
+                            
+                            /* stack indices: this=0, long handle=1-2, MouseButtonInfo info=3, int action=4 */
+                            
+                            /* get button from MouseButtonInfo.button() */
+                            super.visitVarInsn(Opcodes.ALOAD, 3);  // Load MouseButtonInfo
+                            super.visitMethodInsn(
+                                Opcodes.INVOKEVIRTUAL,
+                                "net/minecraft/client/input/MouseButtonInfo",
+                                "button",
+                                "()I",
+                                false
+                            );
+                            
+                            /* get action from parameter */
+                            super.visitVarInsn(Opcodes.ILOAD, 4);
+                            
+                            /* get modifiers from MouseButtonInfo.modifiers() */
+                            super.visitVarInsn(Opcodes.ALOAD, 3);  // Load MouseButtonInfo
+                            super.visitMethodInsn(
+                                Opcodes.INVOKEVIRTUAL,
+                                "net/minecraft/client/input/MouseButtonInfo",
+                                "modifiers",
+                                "()I",
+                                false
+                            );
+                            
+                            /* call our code */
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "QubicNative",
+                                "OnMouseButton",
+                                "(III)V",
+                                false
+                            );
+                        }
+                    };
+                }
+
+                /* hook into onScroll(), signature: (JDD)V */
+                if (Name.equals("onScroll") && Descriptor.equals("(JDD)V")) {
+                    System.out.println("[Qubic] Found MouseHandler.onScroll, injecting scroll event!");
+                    
+                    return new MethodVisitor(Opcodes.ASM9, Mv) {
+                        @Override
+                        public void visitCode() {
+                            super.visitCode();
+                            
+                            /* Stack indices: this=0, long handle=1-2, double xoffset=3-4, double yoffset=5-6 */
+                            
+                            /* load xoffset (horizontal scroll) */
+                            super.visitVarInsn(Opcodes.DLOAD, 3);
+                            
+                            /* load yoffset (vertical scroll) */
+                            super.visitVarInsn(Opcodes.DLOAD, 5);
+                            
+                            /* call our code */
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "QubicNative",
+                                "OnMouseScroll",
+                                "(DD)V",
+                                false
+                            );
+                        }
+                    };
+                }
+                
+                return Mv;
+            }
+        };
+        
+        Reader.accept(Visitor, 0);
+        return Writer.toByteArray();
     }
     
     private byte[] TransformKeyboardHandler(byte[] ClassBytes) {
@@ -110,7 +208,7 @@ public class QubicTransformer implements ClassFileTransformer {
                                 false
                             );
                             
-                            /* call our native handler: QubicNative.OnKeyInput(key, scancode, action, mods) */
+                            /* call our code */
                             super.visitMethodInsn(
                                 Opcodes.INVOKESTATIC,
                                 "QubicNative",

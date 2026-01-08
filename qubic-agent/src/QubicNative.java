@@ -11,7 +11,11 @@ public class QubicNative {
     public static native boolean HasModResource(String path);
 
     public static native void OnPlayerJoin(Object player, Object world);
+    
     public static native void OnKeyInput(int key, int scancode, int action, int mods);
+    public static native void OnMouseButton(int button, int action, int mods);
+    public static native void OnMouseScroll(double horizontal, double vertical);
+    
     public static native void OnPlayerTick(Object player, Object world);
     public static native void OnServerTick();
 }

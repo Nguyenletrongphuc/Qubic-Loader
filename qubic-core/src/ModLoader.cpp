@@ -10,7 +10,10 @@
 
 #include <qubic-api/inc/Event/PlayerJoinEvent.hpp>
 #include <qubic-api/inc/Event/PlayerTickEvent.hpp>
+
 #include <qubic-api/inc/Event/KeyInputEvent.hpp>
+#include <qubic-api/inc/Event/MouseInputEvent.hpp>
+#include <qubic-api/inc/Event/MouseScrollInputEvent.hpp>
 
 namespace fs = std::filesystem;
 
@@ -86,7 +89,6 @@ extern "C" {
         printf("[Qubic] All items registered!\n");
     }
 
-    /* dispatching the player join event to mods */
     DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnPlayerJoin(JNIEnv* env, jclass clazz, jobject player, jobject world) {
         if (!gModLoader) {
             printf("[Qubic] ERROR: ModLoader not initialized!\n");
@@ -99,9 +101,35 @@ extern "C" {
         event.world = world;
         event.env = env;
         
+        /* dispatch player join event to all mods */
         for (auto& mod : gModLoader->ModVector) {
             if (mod.ModInstance)
                 mod.ModInstance->OnPlayerJoin(&event);
+        }
+    }
+    
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnPlayerTick(JNIEnv* env, jclass clazz, jobject player, jobject world) {
+        if (!gModLoader) return;
+        
+        Qubic::PlayerTickEvent event;
+        event.player = player;
+        event.world = world;
+        event.env = env;
+        
+        /* dispatch on tick event to all mods */
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->OnPlayerTick(&event);
+        }
+    }
+    
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnServerTick(JNIEnv* env, jclass clazz) {
+        if (!gModLoader) return;
+        
+        /* dispatch on sever tick event to all mods */
+        for (auto& mod : gModLoader->ModVector) {
+            if (mod.ModInstance)
+                mod.ModInstance->on_tick(&mod.State);
         }
     }
 
@@ -115,33 +143,41 @@ extern "C" {
         event.mods = mods;
         event.env = env;
 
-        /* dispatch key input to all mods */
+        /* dispatch key input event to all mods */
         for (auto& mod : gModLoader->ModVector) {
             if (mod.ModInstance)
                 mod.ModInstance->OnKeyInput(&event);
         }
     }
-    
-    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnPlayerTick(JNIEnv* env, jclass clazz, jobject player, jobject world) {
+
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnMouseButton(JNIEnv* env, jclass clazz, jint button, jint action, jint mods) {
         if (!gModLoader) return;
         
-        Qubic::PlayerTickEvent event;
-        event.player = player;
-        event.world = world;
+        Qubic::MouseInputEvent event;
+        event.button = button;
+        event.action = action;
+        event.mods = mods;
         event.env = env;
-        
+    
+        /* dispatch on mouse button event to all mods */
         for (auto& mod : gModLoader->ModVector) {
             if (mod.ModInstance)
-                mod.ModInstance->OnPlayerTick(&event);
+                mod.ModInstance->OnMouseButton(&event);
         }
     }
-    
-    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnServerTick(JNIEnv* env, jclass clazz) {
+
+    DLL_EXPORT JNIEXPORT void JNICALL Java_QubicNative_OnMouseScroll(JNIEnv* env, jclass clazz, jdouble horizontal, jdouble vertical) {
         if (!gModLoader) return;
         
+        Qubic::MouseScrollInputEvent event;
+        event.horizontal = horizontal;
+        event.vertical = vertical;
+        event.env = env;
+    
+        /* dispatch on mouse scroll input event to all mods */
         for (auto& mod : gModLoader->ModVector) {
             if (mod.ModInstance)
-                mod.ModInstance->on_tick(&mod.State);
+                mod.ModInstance->OnMouseScroll(&event);
         }
     }
 }

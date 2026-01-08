@@ -6,7 +6,10 @@
 
 #include <qubic-api/inc/Event/PlayerJoinEvent.hpp>
 #include <qubic-api/inc/Event/PlayerTickEvent.hpp>
+
 #include <qubic-api/inc/Event/KeyInputEvent.hpp>
+#include <qubic-api/inc/Event/MouseInputEvent.hpp>
+#include <qubic-api/inc/Event/MouseScrollInputEvent.hpp>
 
 #include <qubic-api/inc/ActionContext/ItemActionContext.hpp> // IAC
 
@@ -25,6 +28,7 @@ void OnTestItemUse(Qubic::ItemActionContext* ctx) {
     ctx->consume_item = false;
 }
 
+float MouseScroll = 0;
 struct TestMod final : public Qubic::BaseMod {
 public:
     static constexpr const char* ID = "testmod";
@@ -64,6 +68,10 @@ public:
 
     void OnPlayerTick(Qubic::PlayerTickEvent* e) override {
         printf("[TestMod] Player tick!\n");
+        
+        Qubic::Player player(e->player, e->env);
+
+        player.SendMessage(std::to_string(MouseScroll));
     }
     
     void OnKeyInput(Qubic::KeyInputEvent* e) override {
@@ -79,8 +87,40 @@ public:
                 printf("[TestMod] CTRL+G pressed!\n");
         }
     }
+
+    void OnMouseButton(Qubic::MouseInputEvent* e) override {
+        if (e->IsPress()) {
+            if (e->IsLeftButton())
+                printf("[TestMod] Left mouse button pressed!\n");
+            
+            if (e->IsRightButton())
+                printf("[TestMod] Right mouse button pressed!\n");
+            
+            if (e->IsMiddleButton())
+                printf("[TestMod] Middle mouse button pressed!\n");
+            
+            if (e->button == QUBIC_MOUSE_BUTTON_4)
+                printf("[TestMod] Mouse button 4 pressed!\n");
+            
+            if (e->HasShift())
+                printf("[TestMod] With SHIFT modifier!\n");
+        }
+    }
+
+    void OnMouseScroll(Qubic::MouseScrollInputEvent* e) override {
+        if (e->IsScrollUp())
+            printf("[TestMod] Scrolled UP: %.2f\n", e->vertical);
+        else if (e->IsScrollDown())
+            printf("[TestMod] Scrolled DOWN: %.2f\n", e->vertical);
+        
+        if (e->HasHorizontalScroll())
+            printf("[TestMod] Horizontal scroll: %.2f\n", e->horizontal);
+        
+        MouseScroll = e->vertical;
+    }
 }; 
 
+// TODO: Make a "LocalPlayer" class or thing that allows you to set the clients fov and client based attributes like that
 
 MOD_EXPORT Qubic::ModState* mod_load(Qubic::ModState* state) {
     printf("mod loaded!\n");

@@ -14,7 +14,7 @@ note:
 > you will get an 'early member' role, after 1,000 - 2,000 people joined you will not be able to obtain it anymore..
 
 # INFORMATION
-heres an example of what a build of qubic-loader looks like:
+heres what a build of qubic-loader looks like:
 ![build](./assets/build.png) 
 
 note: 
